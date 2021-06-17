@@ -20,10 +20,10 @@ services:
 
       DB_TYPE: postgresql
       DB_DRIVER: psycopg2
-      DB_USER: root
-      DB_PASSWORD: root
+      DB_USER: test
+      DB_PASSWORD: test
       DB_HOST: db
-      DB_NAME: agent
+      DB_NAME: main
 
       TEST_DATABASE_URI: sqlite:///database.db
 

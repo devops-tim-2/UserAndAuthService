@@ -1,3 +1,4 @@
+from models.models import AgentRequest, User, Follow, Block
 from os import environ
 from typing import Tuple
 from flask_cors import CORS
@@ -60,11 +61,9 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
         db.create_all()
 
     if cfg_name == 'test':
-        # OrderItem.query.delete()
-        # Order.query.delete()
-        # Product.query.delete()
-        # Catalog.query.delete()
-        # User.query.delete()
-        pass
+        User.query.delete()
+        Follow.query.delete()
+        Block.query.delete()
+        AgentRequest.query.delete()
     
     return app, db
