@@ -4,4 +4,3 @@ app, db = setup_config('dev')
 
 if __name__ == '__main__':
     app.run()
-
