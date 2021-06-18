@@ -27,6 +27,8 @@ services:
 
       TEST_DATABASE_URI: sqlite:///database.db
 
+      RABBITMQ_URI: amqps://qilglokd:nlmVctERVcA7th3VCE1-UL_uij-BCXyj@roedeer.rmq.cloudamqp.com/qilglokd
+
       KEY: ${KEY}
       JWT_ALGORITHM: ${JWT_ALGORITHM}
       JWT_SECRET: ${JWT_SECRET}

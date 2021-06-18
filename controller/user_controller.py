@@ -1,4 +1,6 @@
 from flask_restful import Resource, reqparse
+from service import user_service
+from models.models import User
 
 dto_parser = reqparse.RequestParser()
 dto_parser.add_argument('username', type=str, help='Username for user account')
@@ -34,11 +36,10 @@ agent_request_parser.add_argument('u_id', type=int, help='Agent entity id')
 
 class UserResource(Resource):
     def __init__(self):
-        #self.service = service
         pass
 
     def get(self, user_id):
-        pass
+        return user_id
 
     def put(self, user_id):
         pass
@@ -48,15 +49,13 @@ class UserResource(Resource):
 
 class UserListResource(Resource):
     def __init__(self):
-        #self.service = service
         pass
 
-    def post(self):
+    def get(self):
         pass
 
 class LoginResource(Resource):
     def __init__(self):
-        #self.service = service
         pass
 
     def post(self):
@@ -64,15 +63,35 @@ class LoginResource(Resource):
 
 class RegisterResource(Resource):
     def __init__(self):
-        #self.service = service
         pass
 
     def post(self):
-        pass
+        args = dto_parser.parse_args()
+        user = User(
+            username=args['username'],
+            password=args['password'],
+            role=args['role'],
+            age=args['age'],
+            sex=args['sex'],
+            region=args['region'],
+            interests=args['interests'],
+            bio=args['bio'],
+            website=args['website'],
+            phone=args['phone'],
+            mail=args['mail'],
+            profile_image_link=args['profile_image_link'],
+            public=args['public'],
+            taggable=args['taggable'],
+            state="PENDING"
+        )
+
+
+        user_persistent = user_service.register_user(user)
+        return (user_persistent.id,200) if user_persistent else ('Creating user failed',400)
+
 
 class FollowResource(Resource):
     def __init__(self):
-        #self.service = service
         pass
 
     def post(self):
@@ -80,7 +99,6 @@ class FollowResource(Resource):
 
 class MuteResource(Resource):
     def __init__(self):
-        #self.service = service
         pass
 
     def get(self):
@@ -89,7 +107,6 @@ class MuteResource(Resource):
 
 class BlockResource(Resource):
     def __init__(self):
-        #self.service = service
         pass
 
     def post(self):
