@@ -10,7 +10,7 @@ def auth(headers):
     token = headers['Authorization'].split(' ')[1]
     try:
         payload = jwt.decode(token, environ.get('JWT_SECRET'), environ.get('JWT_ALGORITHM'))
-    except:
+    except Exception:
         return 'Forbidden, invalid authentication.', 401
 
     exp = payload['exp']
