@@ -1,4 +1,6 @@
 from flask_restful import Resource, reqparse
+from service import user_service
+from models.models import User
 
 dto_parser = reqparse.RequestParser()
 dto_parser.add_argument('username', type=str, help='Username for user account')
@@ -73,8 +75,37 @@ class RegisterResource(Resource):
         pass
 
     def post(self):
-        # To be implemented.
-        pass
+        args = dto_parser.parse_args()
+        user = User(
+            username=args['username'],
+            password=args['password'],
+            role=args['role'],
+            age=args['age'],
+            sex=args['sex'],
+            region=args['region'],
+            interests=args['interests'],
+            bio=args['bio'],
+            website=args['website'],
+            phone=args['phone'],
+            mail=args['mail'],
+            profile_image_link=args['profile_image_link'],
+            public=args['public'],
+            taggable=args['taggable'],
+            state="PENDING"
+        )
+
+        try:
+            user_persistent = user_service.register_user(user)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else 'Something went wrong...',400)
+            
+        if user_persistent:
+            dt = user_persistent.get_dict()
+            del dt['password']
+            return (dt,200) 
+            
+        return 'Creating user failed',400
+
 
 class FollowResource(Resource):
     def __init__(self):

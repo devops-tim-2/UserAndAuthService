@@ -1,6 +1,5 @@
 from common.config import setup_config
 from os import environ
-
 app, db = setup_config('dev')
 
 if __name__ == '__main__':
