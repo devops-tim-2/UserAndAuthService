@@ -1,6 +1,8 @@
 from common.database import db
 import dataclasses
 
+USER_ID_FIELD = 'user.id'
+
 @dataclasses.dataclass
 class User(db.Model):
     id: int
@@ -53,8 +55,8 @@ class Follow(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     mute = db.Column(db.Boolean, nullable=False)
-    src = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    dst = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    src = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
+    dst = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
     
     def __repr__(self):
         return f'<Follow {self.src}->{self.dst} ({self.mute})>'
@@ -70,8 +72,8 @@ class Block(db.Model):
     dst: int
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    src = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    dst = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    src = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
+    dst = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
     
     def __repr__(self):
         return f'<Block {self.src}->{self.dst}>'
@@ -87,7 +89,7 @@ class AgentRequest(db.Model):
     u_id: int
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    u_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    u_id = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
     
     def __repr__(self):
         return f'<AgentRequest {self.u_id}>'

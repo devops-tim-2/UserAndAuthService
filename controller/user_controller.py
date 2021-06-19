@@ -36,29 +36,37 @@ agent_request_parser.add_argument('u_id', type=int, help='Agent entity id')
 
 class UserResource(Resource):
     def __init__(self):
+        # To be implemented.
         pass
 
     def get(self, user_id):
-        return user_id
+        # To be implemented.
+        pass
 
     def put(self, user_id):
+        # To be implemented.
         pass
 
     def delete(self, user_id):
+        # To be implemented.
         pass
 
 class UserListResource(Resource):
     def __init__(self):
+        # To be implemented.
         pass
 
-    def get(self):
+    def post(self):
+        # To be implemented.
         pass
 
 class LoginResource(Resource):
     def __init__(self):
+        # To be implemented.
         pass
 
     def post(self):
+        # To be implemented.
         pass
 
 class RegisterResource(Resource):
@@ -103,19 +111,24 @@ class FollowResource(Resource):
         pass
 
     def post(self):
+        # To be implemented.
         pass
 
 class MuteResource(Resource):
     def __init__(self):
+        # To be implemented.
         pass
 
     def get(self):
+        # To be implemented.
         pass
 
 
 class BlockResource(Resource):
     def __init__(self):
+        # To be implemented.
         pass
 
     def post(self):
+        # To be implemented.
         pass
