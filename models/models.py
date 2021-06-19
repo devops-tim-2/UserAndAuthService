@@ -44,6 +44,7 @@ class User(db.Model):
 
     def get_dict(self):
         return dataclasses.asdict(self)
+        
 
 @dataclasses.dataclass
 class Follow(db.Model):

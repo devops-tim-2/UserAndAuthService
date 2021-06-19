@@ -6,7 +6,7 @@ from flask_restful import Api
 from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
 from common.database import db
-from flask_wtf import CsrfProtect
+from flask_wtf import CSRFProtect
 
 
 DevConfig = {
@@ -39,7 +39,13 @@ config: dict = {
 
 def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
     app = Flask(__name__)
-    csrf = CsrfProtect()
+    
+    if environ.get('ENABLE_CSRF') == 1:
+        app.config['SECRET_KEY'] = environ.get('SECRET_KEY')
+        app.config['WTF_CSRF_SECRET_KEY'] = environ.get('WTF_CSRF_SECRET_KEY')
+        csrf = CSRFProtect()
+        csrf.init_app(app)
+        
     CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "send_wildcard": "False"}}) 
     api = Api(app)
 
@@ -58,7 +64,7 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
 
     app.app_context().push()
     db.init_app(app)
-    csrf.init_app(app)
+
 
     with app.app_context():
         db.create_all()
