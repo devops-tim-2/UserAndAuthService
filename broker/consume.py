@@ -1,7 +1,7 @@
 import pika
 from os import environ
 
-params = pika.URLParameters(environ('RABBITMQ_URI'))
+params = pika.URLParameters(environ.get('RABBITMQ_URI'))
 connection = pika.BlockingConnection(params)
 channel = connection.channel()
 

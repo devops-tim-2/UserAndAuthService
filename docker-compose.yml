@@ -43,6 +43,8 @@ services:
     command: 'python -u broker/consume.py'
     depends_on:
       - db
+    environment:
+      RABBITMQ_URI: amqps://qilglokd:nlmVctERVcA7th3VCE1-UL_uij-BCXyj@roedeer.rmq.cloudamqp.com/qilglokd
     networks:
       - apigateway_the_network
 

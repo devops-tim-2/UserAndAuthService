@@ -85,9 +85,17 @@ class RegisterResource(Resource):
             state="PENDING"
         )
 
-
-        user_persistent = user_service.register_user(user)
-        return (user_persistent.id,200) if user_persistent else ('Creating user failed',400)
+        try:
+            user_persistent = user_service.register_user(user)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else 'Something went wrong...',400)
+            
+        if user_persistent:
+            dt = user_persistent.get_dict()
+            del dt['password']
+            return (dt,200) 
+            
+        return 'Creating user failed',400
 
 
 class FollowResource(Resource):
