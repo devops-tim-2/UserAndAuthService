@@ -40,7 +40,7 @@ config: dict = {
 def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
     app = Flask(__name__)
     csrf = CsrfProtect()
-    CORS(app, resources={r"/*": {"origins": "*", "send_wildcard": "False"}}) 
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "send_wildcard": "False"}}) 
     api = Api(app)
 
     from controller.user_controller import UserResource, UserListResource, LoginResource, RegisterResource, FollowResource, MuteResource, BlockResource
