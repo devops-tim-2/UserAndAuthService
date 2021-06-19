@@ -6,6 +6,7 @@ from flask_restful import Api
 from flask.app import Flask
 from flask_sqlalchemy import SQLAlchemy
 from common.database import db
+from flask_wtf import CsrfProtect
 
 
 DevConfig = {
@@ -38,7 +39,8 @@ config: dict = {
 
 def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
     app = Flask(__name__)
-    CORS(app)
+    csrf = CsrfProtect()
+    CORS(app, resources={r"/*": {"origins": "*", "send_wildcard": "False"}}) 
     api = Api(app)
 
     from controller.user_controller import UserResource, UserListResource, LoginResource, RegisterResource, FollowResource, MuteResource, BlockResource
@@ -56,6 +58,7 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
 
     app.app_context().push()
     db.init_app(app)
+    csrf.init_app(app)
 
     with app.app_context():
         db.create_all()
