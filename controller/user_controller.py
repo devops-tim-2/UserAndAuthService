@@ -78,6 +78,7 @@ class RegisterResource(Resource):
 
 class FollowResource(Resource):
     def __init__(self):
+        # To be implemented.
         pass
 
     def post(self):
