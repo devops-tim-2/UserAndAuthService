@@ -10,7 +10,7 @@ user_invalid_role = { "username": "user2","password": "user","role": "idk","age"
 def test_register_okay_user(mocker):
     expected = User(**valid_user, state='ACCEPTED', id=-1)
     mocker.patch('service.user_service.user_repository.create', return_value=expected)
-    mocker.patch('broker.produce.publish', return_value=None)
+    mocker.patch('broker.producer.publish', return_value=None)
     actual = user_service.register_user(User(**valid_user, state='PENDING'))
     
     assert hasattr(actual, 'id')
@@ -25,7 +25,7 @@ def test_register_okay_agent(mocker):
     expected_agent_request = AgentRequest(id=-1, u_id=-1)
     mocker.patch('service.user_service.user_repository.create', return_value=expected)
     mocker.patch('service.user_service.agent_request_repository.create', return_value=expected_agent_request)
-    mocker.patch('broker.produce.publish', return_value=None)
+    mocker.patch('broker.producer.publish', return_value=None)
     actual = user_service.register_user(User(**valid_agent, state='PENDING'))
     assert hasattr(actual, 'id')
     actual.id = -1
@@ -37,5 +37,5 @@ def test_register_okay_agent(mocker):
 def test_register_no_role(mocker):
     with pytest.raises(Exception):
         mocker.patch('service.user_service.user_repository.create', return_value=None)
-        mocker.patch('broker.produce.publish', return_value=None)
+        mocker.patch('broker.producer.publish', return_value=None)
         user_service.register_user(User(**user_invalid_role, state='PENDING'))

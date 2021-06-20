@@ -1,10 +1,18 @@
-from common.database import db
-import dataclasses
+from dataclasses import dataclass, asdict
+
+from sqlalchemy import Column, Integer, String, Boolean, \
+     ForeignKey
+
+from sqlalchemy.ext.declarative import declarative_base
+
+Model = declarative_base(name='Model')
+
 
 USER_ID_FIELD = 'user.id'
 
-@dataclasses.dataclass
-class User(db.Model):
+@dataclass
+class User(Model):
+    __tablename__ = 'user'
     id: int
     username: str
     password: str
@@ -22,78 +30,81 @@ class User(db.Model):
     taggable: bool
     state: str #PENDING, ACCEPTED, REJECTED
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(127),unique=True, nullable=False)
-    password = db.Column(db.String(127), nullable=False)
-    role = db.Column(db.String(127), nullable=False)
-    age = db.Column(db.Integer, nullable=False)
-    sex = db.Column(db.String(127), nullable=False)
-    region = db.Column(db.String(127), nullable=False)
-    interests = db.Column(db.String(127), nullable=False)
-    bio = db.Column(db.String(127), nullable=False)
-    website = db.Column(db.String(127), nullable=False)
-    phone = db.Column(db.String(127), nullable=False)
-    mail = db.Column(db.String(127),unique=True, nullable=False)
-    profile_image_link = db.Column(db.String(127), nullable=False)
-    public = db.Column(db.Boolean, nullable=False)
-    taggable = db.Column(db.Boolean, nullable=False)
-    state = db.Column(db.String(127), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(127),unique=True, nullable=False)
+    password = Column(String(127), nullable=False)
+    role = Column(String(127), nullable=False)
+    age = Column(Integer, nullable=False)
+    sex = Column(String(127), nullable=False)
+    region = Column(String(127), nullable=False)
+    interests = Column(String(127), nullable=False)
+    bio = Column(String(127), nullable=False)
+    website = Column(String(127), nullable=False)
+    phone = Column(String(127), nullable=False)
+    mail = Column(String(127),unique=True, nullable=False)
+    profile_image_link = Column(String(127), nullable=False)
+    public = Column(Boolean, nullable=False)
+    taggable = Column(Boolean, nullable=False)
+    state = Column(String(127), nullable=False)
     
     def __repr__(self):
         return '<User %r>' % self.username
 
     def get_dict(self):
-        return dataclasses.asdict(self)
+        return asdict(self)
         
 
-@dataclasses.dataclass
-class Follow(db.Model):
+@dataclass
+class Follow(Model):
+    __tablename__ = 'follow'
     id: int
     src: int
     dst: int
     mute: bool
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    mute = db.Column(db.Boolean, nullable=False)
-    src = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
-    dst = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    mute = Column(Boolean, nullable=False)
+    src = Column(Integer, ForeignKey(USER_ID_FIELD), nullable=False)
+    dst = Column(Integer, ForeignKey(USER_ID_FIELD), nullable=False)
     
     def __repr__(self):
         return f'<Follow {self.src}->{self.dst} ({self.mute})>'
 
     def get_dict(self):
-        return dataclasses.asdict(self)
+        return asdict(self)
 
 
-@dataclasses.dataclass
-class Block(db.Model):
+@dataclass
+class Block(Model):
+    __tablename__ = 'block'
     id: int
     src: int
     dst: int
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    src = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
-    dst = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    src = Column(Integer, ForeignKey(USER_ID_FIELD), nullable=False)
+    dst = Column(Integer, ForeignKey(USER_ID_FIELD), nullable=False)
     
     def __repr__(self):
         return f'<Block {self.src}->{self.dst}>'
 
     def get_dict(self):
-        return dataclasses.asdict(self)
+        return asdict(self)
 
 
 
-@dataclasses.dataclass
-class AgentRequest(db.Model):
+@dataclass
+class AgentRequest(Model):
+    __tablename__ = 'agentrequest'
     id: int
     u_id: int
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    u_id = db.Column(db.Integer, db.ForeignKey(USER_ID_FIELD), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    u_id = Column(Integer, ForeignKey(USER_ID_FIELD), nullable=False)
     
     def __repr__(self):
         return f'<AgentRequest {self.u_id}>'
 
     def get_dict(self):
-        return dataclasses.asdict(self)
+        return asdict(self)
 

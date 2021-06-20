@@ -97,7 +97,7 @@ class RegisterResource(Resource):
         try:
             user_persistent = user_service.register_user(user)
         except Exception as e:
-            return (e.message if hasattr(e, 'message') else 'Something went wrong...',400)
+            return (e.message if hasattr(e, 'message') else str(e),400)
             
         if user_persistent:
             dt = user_persistent.get_dict()
