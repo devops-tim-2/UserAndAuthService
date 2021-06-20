@@ -1,7 +1,7 @@
 from broker.producer import publish
-from models.models import AgentRequest, User
-from exceptions.exceptions import InvalidRoleException, InvalidCredentialsException
-from repository import user_repository, agent_request_repository
+from models.models import AgentRequest, Follow, FollowRequest, User
+from exceptions.exceptions import AlreadyFollowException, AlreadySentFollowRequestException, InvalidRoleException, InvalidCredentialsException, MissingUserException
+from repository import user_repository, agent_request_repository, follow_request_repository, follow_repository
 import bcrypt 
 
 import time
@@ -59,3 +59,31 @@ def login(username, password):
         return encoded_jwt
 
     raise InvalidCredentialsException()
+
+
+def follow(follow):
+    src_user = user_repository.get_by_id(follow.src)
+    dst_user = user_repository.get_by_id(follow.dst)
+
+    if src_user is None or dst_user is None:
+        raise MissingUserException()
+
+    if follow_request_repository.exists(follow.src, follow.dst):
+        raise AlreadySentFollowRequestException()
+    if follow_repository.exists(follow.src, follow.dst):
+        raise AlreadyFollowException()
+        
+    if not dst_user.public:
+        if follow_request_repository.exists(follow.dst, follow.src):
+            persisted_follow_src_dst = follow_repository.create(follow)
+            persisted_follow_dst_src = follow_repository.create(Follow(src=follow.dst, dst=follow.src, mute=follow.mute))
+            publish('user.follow.created', persisted_follow_src_dst.get_dict())
+            publish('user.follow.created', persisted_follow_dst_src.get_dict())
+        elif follow_repository.exists(follow.dst, follow.src):
+            persisted_follow = follow_repository.create(follow)
+            publish('user.follow.created', persisted_follow.get_dict())
+        else:
+            follow_request_repository.create(FollowRequest(src=follow.src, dst=follow.dst, mute=follow.mute))
+    else:
+        persisted_follow = follow_repository.create(follow)
+        publish('user.follow.created', persisted_follow.get_dict())

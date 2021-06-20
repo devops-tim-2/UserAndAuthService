@@ -2,9 +2,8 @@ from os import environ
 from datetime import datetime
 import jwt
 
-
 def auth(headers):
-    if not headers.has_key('Authorization'):
+    if not ('Authorization' in headers):
         return 'Forbidden, unauthorized atempt.', 403
 
     token = headers['Authorization'].split(' ')[1]
