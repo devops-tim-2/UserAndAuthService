@@ -1,43 +1,17 @@
-from models.models import AgentRequest, User, Follow, Block
 from os import environ
-from typing import Tuple
 from flask_cors import CORS
-from flask_restful import Api
 from flask.app import Flask
-from flask_sqlalchemy import SQLAlchemy
-from common.database import db
 from flask_wtf import CSRFProtect
+from flask_restful import Api
 
-
-DevConfig = {
-    'DEBUG': True,
-    'DEVELOPMENT': True,
-    'SQLALCHEMY_DATABASE_URI': f'{environ.get("DB_TYPE")}+{environ.get("DB_DRIVER")}://{environ.get("DB_USER")}:{environ.get("DB_PASSWORD")}@{environ.get("DB_HOST")}/{environ.get("DB_NAME")}',
-    'SQLALCHEMY_ECHO': True,
-    'SQLALCHEMY_TRACK_MODIFICATIONS': False
+config = {
+    'test': 'TEST_DATABASE_URI',
+    'dev': 'DEV_DATABASE_URI'
 }
 
-
-ProdConfig = {}
-
-
-TestConfig = {
-    'DEBUG': False,
-    'DEVELOPMENT': True,
-    'SQLALCHEMY_DATABASE_URI': f'{environ.get("TEST_DATABASE_URI")}',
-    'SQLALCHEMY_ECHO': True,
-    'SQLALCHEMY_TRACK_MODIFICATIONS': False
-}
-
-
-config: dict = {
-    'dev': DevConfig,
-    'prod': ProdConfig,
-    'test': TestConfig
-}
-
-
-def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
+def setup_config(cfg_name: str):
+    environ['SQLALCHEMY_DATABASE_URI'] = environ.get(config[cfg_name])
+    
     app = Flask(__name__)
     
     if environ.get('ENABLE_CSRF') == 1:
@@ -49,6 +23,13 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
     CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "send_wildcard": "False"}}) 
     api = Api(app)
 
+
+    # This import must be postponed because importing common.database has side-effects
+    from common.database import init_db
+    init_db()
+
+
+    # This import must be postponed after init_db has been called
     from controller.user_controller import UserResource, UserListResource, LoginResource, RegisterResource, FollowResource, MuteResource, BlockResource
     api.add_resource(UserResource, '/api/<user_id>')
     api.add_resource(UserListResource, '/api')
@@ -58,21 +39,13 @@ def setup_config(cfg_name: str) -> Tuple[Flask, SQLAlchemy]:
     api.add_resource(MuteResource, '/api/follow/mute')
     api.add_resource(BlockResource, '/api/block')
 
-    cfg = config.get(cfg_name)
-    for key in cfg.keys():
-        app.config[key] = cfg[key]
 
-    app.app_context().push()
-    db.init_app(app)
-
-
-    with app.app_context():
-        db.create_all()
-
+    # This import must be postponed after init_db has been called
+    from models.models import AgentRequest, User, Follow, Block
     if cfg_name == 'test':
         User.query.delete()
         Follow.query.delete()
         Block.query.delete()
         AgentRequest.query.delete()
     
-    return app, db
+    return app

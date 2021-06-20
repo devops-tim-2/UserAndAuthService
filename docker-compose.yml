@@ -3,7 +3,7 @@ networks:
   apigateway_the_network:
     external: true
 services:
-  backend:
+  user_backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,7 +13,7 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - db
+      - user_queue
     environment:
       FLASK_ENV: development
       FLASK_RUN_HOST: 0.0.0.0
@@ -22,11 +22,13 @@ services:
       DB_DRIVER: psycopg2
       DB_USER: test
       DB_PASSWORD: test
-      DB_HOST: db
+      DB_HOST: user_db
       DB_NAME: main
 
+ 
       TEST_DATABASE_URI: sqlite:///database.db
-
+      DEV_DATABASE_URI: postgresql+psycopg2://test:test@user_db/main
+      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://test:test@user_db/main
       RABBITMQ_URI: amqps://qilglokd:nlmVctERVcA7th3VCE1-UL_uij-BCXyj@roedeer.rmq.cloudamqp.com/qilglokd
 
       KEY: ${KEY}
@@ -36,19 +38,22 @@ services:
     networks:
       - apigateway_the_network
 
-  queue:
+  user_queue:
     build:
       context: .
       dockerfile: Dockerfile
-    command: 'python -u broker/consume.py'
+    command: 'python -u consume.py'
     depends_on:
-      - db
+      - user_db
     environment:
+      TEST_DATABASE_URI: sqlite:///database.db
+      DEV_DATABASE_URI: postgresql+psycopg2://test:test@user_db/main
+      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://test:test@user_db/main
       RABBITMQ_URI: amqps://qilglokd:nlmVctERVcA7th3VCE1-UL_uij-BCXyj@roedeer.rmq.cloudamqp.com/qilglokd
     networks:
       - apigateway_the_network
 
-  db:
+  user_db:
     image: postgres:latest
     environment:
       POSTGRES_USER: test
@@ -61,4 +66,4 @@ services:
     ports:
       - 54322:5432
     networks:
-      - apigateway_the_network
+      - apigateway_the_network  
