@@ -8,6 +8,10 @@ import time
 from os import environ
 import jwt
 
+MESSAGE_USER_FOLLOW_CREATED = 'user.follow.created'
+MESSAGE_AGENT_REQUEST_CREATED = 'agent.request.created'
+MESSAGE_USER_CREATED = 'user.created'
+
 def register_user(user:User) -> User:
     # Server validates sent data
     if user.role == 'agent':
@@ -25,7 +29,7 @@ def register_user(user:User) -> User:
         del dt['password']
         dt['agent_request_id'] = persisted_agent_request.id
         # agent.request.created event is sent to RabbitMQ
-        publish('agent.request.created', dt)
+        publish(MESSAGE_AGENT_REQUEST_CREATED, dt)
         # If and when administrator approves registration request (when agent.request.approved event is catched), user state is set to ACCEPTED and user.created event is fired
         # If administrator rejects registration request (agent.request.rejected is catched), user state is set to REJECTED and no events are fired
     elif user.role == 'user':
@@ -38,7 +42,7 @@ def register_user(user:User) -> User:
         dt = persisted_user.get_dict()
         del dt['password']
         # user.created event is sent to RabbitMQ
-        publish('user.created', dt)
+        publish(MESSAGE_USER_CREATED, dt)
     else:
         raise InvalidRoleException()
 
@@ -77,17 +81,17 @@ def follow(follow):
         if follow_request_repository.exists(follow.dst, follow.src):
             persisted_follow_src_dst = follow_repository.create(follow)
             persisted_follow_dst_src = follow_repository.create(Follow(src=follow.dst, dst=follow.src, mute=follow.mute))
-            publish('user.follow.created', persisted_follow_src_dst.get_dict())
-            publish('user.follow.created', persisted_follow_dst_src.get_dict())
+            publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow_src_dst.get_dict())
+            publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow_dst_src.get_dict())
             return "Handshake"
         elif follow_repository.exists(follow.dst, follow.src):
             persisted_follow = follow_repository.create(follow)
-            publish('user.follow.created', persisted_follow.get_dict())
+            publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow.get_dict())
             return "Followback"
         else:
             follow_request_repository.create(FollowRequest(src=follow.src, dst=follow.dst, mute=follow.mute))
             return "Request"
     else:
         persisted_follow = follow_repository.create(follow)
-        publish('user.follow.created', persisted_follow.get_dict())
+        publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow.get_dict())
         return "Publicfollow"
