@@ -1,3 +1,4 @@
+from exceptions.exceptions import InvalidCredentialsException
 from flask_restful import Resource, reqparse
 from service import user_service
 from models.models import User
@@ -66,8 +67,18 @@ class LoginResource(Resource):
         pass
 
     def post(self):
-        # To be implemented.
-        pass
+        args = dto_parser.parse_args()
+        username=args['username']
+        password=args['password']
+        
+        try:
+            jwt_token = user_service.login(username, password)
+        except InvalidCredentialsException:
+            return 'Invalid login credentials...',403
+        except Exception as e:
+            return str(e), 400
+        
+        return { 'token': jwt_token }
 
 class RegisterResource(Resource):
     def __init__(self):
@@ -99,6 +110,7 @@ class RegisterResource(Resource):
         except Exception as e:
             return (e.message if hasattr(e, 'message') else str(e),400)
             
+        print(f"#####{user_persistent.get_dict()}####")
         if user_persistent:
             dt = user_persistent.get_dict()
             del dt['password']
