@@ -1,8 +1,12 @@
 from broker.producer import publish
 from models.models import AgentRequest, User
-from exceptions.exceptions import InvalidRoleException
+from exceptions.exceptions import InvalidRoleException, InvalidCredentialsException
 from repository import user_repository, agent_request_repository
 import bcrypt 
+
+import time
+from os import environ
+import jwt
 
 def register_user(user:User) -> User:
     # Server validates sent data
@@ -39,3 +43,19 @@ def register_user(user:User) -> User:
         raise InvalidRoleException()
 
     return persisted_user
+
+def login(username, password):
+    user = user_repository.get_by_username(username)
+    if not user:
+        raise InvalidCredentialsException()
+
+    real_password = user.password
+    if bcrypt.checkpw(password.encode('utf-8'), real_password.encode('utf-8')):
+        user_dict = user.get_dict()
+        del user_dict['password']
+        user_dict["iat"] = round(time.time() * 1000)
+        user_dict["exp"] = round(time.time() * 1000) + 7200000 #2hours from now
+        encoded_jwt = jwt.encode(user_dict, environ.get('JWT_SECRET'), algorithm=environ.get('JWT_ALGORITHM'))
+        return encoded_jwt
+
+    raise InvalidCredentialsException()
