@@ -1,4 +1,4 @@
-from broker.produce import publish
+from broker.producer import publish
 from models.models import AgentRequest, User
 from exceptions.exceptions import InvalidRoleException
 from repository import user_repository, agent_request_repository
@@ -29,7 +29,7 @@ def register_user(user:User) -> User:
         user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         # User is saved to database with state set to ACCEPTED
-        user.state = 'PENDING'
+        user.state = 'ACCEPTED'
         persisted_user = user_repository.create(user)
         dt = persisted_user.get_dict()
         del dt['password']
