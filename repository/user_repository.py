@@ -1,6 +1,6 @@
-from common.database import db
+from common.database import db_session
 
 def create(user):
-    db.session.add(user)
-    db.session.commit()
+    db_session.add(user)
+    db_session.commit()
     return user
