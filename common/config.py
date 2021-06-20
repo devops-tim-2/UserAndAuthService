@@ -1,3 +1,4 @@
+from models.models import FollowRequest
 from os import environ
 from flask_cors import CORS
 from flask.app import Flask
@@ -47,5 +48,6 @@ def setup_config(cfg_name: str):
         Follow.query.delete()
         Block.query.delete()
         AgentRequest.query.delete()
+        FollowRequest.query.delete()
     
     return app
