@@ -110,7 +110,6 @@ class RegisterResource(Resource):
         except Exception as e:
             return (e.message if hasattr(e, 'message') else str(e),400)
             
-        print(f"#####{user_persistent.get_dict()}####")
         if user_persistent:
             dt = user_persistent.get_dict()
             del dt['password']
