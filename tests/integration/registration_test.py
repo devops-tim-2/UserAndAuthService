@@ -6,7 +6,7 @@ from models.models import User
 from common.config import setup_config
 import json
 
-class TestUser:
+class TestRegistration:
     @classmethod
     def setup_class(cls):
         cls.app = setup_config('test')
@@ -23,7 +23,6 @@ class TestUser:
     def test_register_happy(self):
         valid_user_2_data = { "username": "user2","password": "password","role": "user","age": 24,"sex": "M","region": "eu","interests": "sport","bio": "test profile 2.","website": "http://www.google.com/","phone": "066345345","mail": "nenad2@misic.com","profile_image_link": "","public": True,"taggable": True }
         response = self.client.post('/api/register', data=json.dumps(valid_user_2_data), content_type='application/json')
-        print(f"######{response.get_json()}")
         assert response.status_code == 200
 
     
