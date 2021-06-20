@@ -79,11 +79,15 @@ def follow(follow):
             persisted_follow_dst_src = follow_repository.create(Follow(src=follow.dst, dst=follow.src, mute=follow.mute))
             publish('user.follow.created', persisted_follow_src_dst.get_dict())
             publish('user.follow.created', persisted_follow_dst_src.get_dict())
+            return "Handshake"
         elif follow_repository.exists(follow.dst, follow.src):
             persisted_follow = follow_repository.create(follow)
             publish('user.follow.created', persisted_follow.get_dict())
+            return "Followback"
         else:
             follow_request_repository.create(FollowRequest(src=follow.src, dst=follow.dst, mute=follow.mute))
+            return "Request"
     else:
         persisted_follow = follow_repository.create(follow)
         publish('user.follow.created', persisted_follow.get_dict())
+        return "Publicfollow"

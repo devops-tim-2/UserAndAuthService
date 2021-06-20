@@ -124,7 +124,11 @@ class FollowResource(Resource):
         pass
 
     def post(self):
-        payload = auth(request.headers)
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
         args = follow_parser.parse_args()
 
         follow = Follow(
@@ -134,10 +138,11 @@ class FollowResource(Resource):
         )
 
         try:
-            follow_persistent = user_service.follow(follow)
+            state = user_service.follow(follow)
         except Exception as e:
             return (e.message if hasattr(e, 'message') else str(e),400)
-        pass
+            
+        return { "state": state }, 200
 
 class MuteResource(Resource):
     def __init__(self):
