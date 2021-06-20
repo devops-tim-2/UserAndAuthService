@@ -9,6 +9,7 @@ Model = declarative_base(name='Model')
 
 
 USER_ID_FIELD = 'user.id'
+FOLLOW_ID_FIELD = 'follow.id'
 
 @dataclass
 class User(Model):
@@ -73,6 +74,24 @@ class Follow(Model):
     def get_dict(self):
         return asdict(self)
 
+@dataclass
+class FollowRequest(Model):
+    __tablename__ = 'followrequest'
+    id: int
+    src: int
+    dst: int
+    mute: bool
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    mute = Column(Boolean, nullable=False)
+    src = Column(Integer, ForeignKey(USER_ID_FIELD), nullable=False)
+    dst = Column(Integer, ForeignKey(USER_ID_FIELD), nullable=False)
+    
+    def __repr__(self):
+        return f'<FollowRequest {self.src}->{self.dst} ({self.mute})>'
+
+    def get_dict(self):
+        return asdict(self)
 
 @dataclass
 class Block(Model):

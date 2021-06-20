@@ -1,7 +1,10 @@
 from exceptions.exceptions import InvalidCredentialsException
 from flask_restful import Resource, reqparse
 from service import user_service
-from models.models import User
+from models.models import User, Follow
+
+from common.utils import auth
+from flask import request
 
 dto_parser = reqparse.RequestParser()
 dto_parser.add_argument('username', type=str, help='Username for user account')
@@ -24,16 +27,12 @@ login_parser.add_argument('username', type=str, help='Username for user account'
 login_parser.add_argument('password', type=str, help='Password for user account')
 
 follow_parser = reqparse.RequestParser()
-follow_parser.add_argument('src', type=str, help='Source of follow')
 follow_parser.add_argument('dst', type=str, help='Destination of follow')
 follow_parser.add_argument('mute', type=bool, help='Did the source mute the destination?')
 
 block_parser = reqparse.RequestParser()
-block_parser.add_argument('src', type=str, help='Source of follow')
 block_parser.add_argument('dst', type=str, help='Destination of follow')
 
-agent_request_parser = reqparse.RequestParser()
-agent_request_parser.add_argument('u_id', type=int, help='Agent entity id')
 
 class UserResource(Resource):
     def __init__(self):
@@ -125,8 +124,25 @@ class FollowResource(Resource):
         pass
 
     def post(self):
-        # To be implemented.
-        pass
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+        args = follow_parser.parse_args()
+
+        follow = Follow(
+            src=payload['id'],
+            dst=args['dst'],
+            mute=args['mute']
+        )
+
+        try:
+            state = user_service.follow(follow)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+            
+        return { "state": state }, 200
 
 class MuteResource(Resource):
     def __init__(self):

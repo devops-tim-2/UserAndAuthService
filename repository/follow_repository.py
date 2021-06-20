@@ -1,0 +1,10 @@
+from common.database import db_session
+from models.models import Follow
+
+def exists(source, destination):
+    return db_session.query(Follow.query.filter(Follow.src == source, Follow.dst == destination).exists()).scalar()
+
+def create(follow):
+    db_session.add(follow)
+    db_session.commit()
+    return follow
