@@ -8,12 +8,12 @@ from sqlalchemy.ext.declarative import declarative_base
 Model = declarative_base(name='Model')
 
 
-USER_ID_FIELD = 'user.id'
+USER_ID_FIELD = 'userprofile.id'
 FOLLOW_ID_FIELD = 'follow.id'
 
 @dataclass
 class User(Model):
-    __tablename__ = 'user'
+    __tablename__ = 'userprofile'
     id: int
     username: str
     password: str
