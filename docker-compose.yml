@@ -7,7 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: 'python main.py'
+    command: sh -c "sleep 10 && python main.py"
     ports:
       - 8082:5000
     volumes:
@@ -42,7 +42,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: 'python -u consume.py'
+    command: sh -c "sleep 7 && python -u consume.py"
     depends_on:
       - user_db
     environment:
