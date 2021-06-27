@@ -55,7 +55,7 @@ class TestFollow:
         follow = { "dst": self.public_1.id, "mute":False }
         response = self.client.post('/api/follow', data=json.dumps(follow), headers={"Authorization": f"Bearer {token}"}, content_type='application/json')
         assert response.status_code == 200
-        assert response.get_json()['state'] == 'Publicfollow'
+        assert response.get_json()['state'] == 'Request'
 
     def test_follow_pub_to_priv(self):
         #self.public_1
@@ -77,7 +77,7 @@ class TestFollow:
         follow = { "dst": self.private_1.id, "mute":False }
         response = self.client.post('/api/follow', data=json.dumps(follow), headers={"Authorization": f"Bearer {token}"}, content_type='application/json')
         assert response.status_code == 200
-        assert response.get_json()['state'] == 'Followback'
+        assert response.get_json()['state'] == 'Handshake'
 
     
     def test_follow_sad(self):

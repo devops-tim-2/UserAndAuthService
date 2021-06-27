@@ -1,3 +1,4 @@
+from controller.user_controller import CocreteFollowResource
 from models.models import FollowRequest
 from os import environ
 from flask_cors import CORS
@@ -37,6 +38,7 @@ def setup_config(cfg_name: str):
     api.add_resource(LoginResource, '/api/login')
     api.add_resource(RegisterResource, '/api/register')
     api.add_resource(FollowResource, '/api/follow')
+    api.add_resource(CocreteFollowResource, '/api/concretefollow/<dst>')
     api.add_resource(MuteResource, '/api/follow/mute')
     api.add_resource(BlockResource, '/api/block')
 
