@@ -1,4 +1,4 @@
-from exceptions.exceptions import NotAccessibleException
+from exceptions.exceptions import NotAccessibleException, NotFoundException
 from broker.producer import publish
 from models.models import AgentRequest, Follow, FollowRequest, User
 from exceptions.exceptions import AlreadyFollowException, AlreadySentFollowRequestException, InvalidRoleException, InvalidCredentialsException, MissingUserException
@@ -78,10 +78,15 @@ def follow(follow):
     if follow_repository.exists(follow.src, follow.dst):
         raise AlreadyFollowException()
         
-    if not dst_user.public:
+    if dst_user.public and src_user.public:
+        persisted_follow = follow_repository.create(follow)
+        publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow.get_dict())
+        return "Publicfollow"
+    else:
         if follow_request_repository.exists(follow.dst, follow.src):
             persisted_follow_src_dst = follow_repository.create(follow)
             persisted_follow_dst_src = follow_repository.create(Follow(src=follow.dst, dst=follow.src, mute=follow.mute))
+            follow_request_repository.delete(follow.dst, follow.src)
             publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow_src_dst.get_dict())
             publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow_dst_src.get_dict())
             return "Handshake"
@@ -92,12 +97,16 @@ def follow(follow):
         else:
             follow_request_repository.create(FollowRequest(src=follow.src, dst=follow.dst, mute=follow.mute))
             return "Request"
-    else:
-        persisted_follow = follow_repository.create(follow)
-        publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow.get_dict())
-        return "Publicfollow"
 
 
+def get_follow(src, dst):
+    if follow_repository.exists(src, dst):
+        follow = follow_repository.get(src,dst)
+        return follow, 'ACCEPTED'
+    elif follow_request_repository.exists(src,dst):
+        follow = follow_request_repository.get(src,dst)
+        return follow, 'PENDING'
+    raise NotFoundException()
 
 def get_by_id(profile_id: int, user: dict):
     profile = user_repository.get_by_id(profile_id)
@@ -105,3 +114,6 @@ def get_by_id(profile_id: int, user: dict):
     pd = profile.get_dict()
     del pd['password']
     return pd
+
+def get_follow_requests(dst):
+    return follow_request_repository.get_by_dst(dst)
