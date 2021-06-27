@@ -1,6 +1,9 @@
 from common.database import db_session
 from models.models import Follow
 
+def get(source, destination):
+    return Follow.query.filter(Follow.src == source, Follow.dst == destination).first()
+
 def exists(source, destination):
     return db_session.query(Follow.query.filter(Follow.src == source, Follow.dst == destination).exists()).scalar()
 
