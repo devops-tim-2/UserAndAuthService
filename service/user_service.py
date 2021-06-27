@@ -102,9 +102,6 @@ def follow(follow):
 def get_by_id(profile_id: int, user: dict):
     profile = user_repository.get_by_id(profile_id)
 
-    # if not profile or (user and block_service.find(user['id'], profile_id)):
-    #     raise NotFoundException(f'Profile with id {profile_id} not found.')
-
     pd = profile.get_dict()
     del pd['password']
     return pd
