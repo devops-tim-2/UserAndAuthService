@@ -1,3 +1,4 @@
+from exceptions.exceptions import NotAccessibleException
 from broker.producer import publish
 from models.models import AgentRequest, Follow, FollowRequest, User
 from exceptions.exceptions import AlreadyFollowException, AlreadySentFollowRequestException, InvalidRoleException, InvalidCredentialsException, MissingUserException
@@ -95,3 +96,15 @@ def follow(follow):
         persisted_follow = follow_repository.create(follow)
         publish(MESSAGE_USER_FOLLOW_CREATED, persisted_follow.get_dict())
         return "Publicfollow"
+
+
+
+def get_by_id(profile_id: int, user: dict):
+    profile = user_repository.get_by_id(profile_id)
+
+    # if not profile or (user and block_service.find(user['id'], profile_id)):
+    #     raise NotFoundException(f'Profile with id {profile_id} not found.')
+
+    pd = profile.get_dict()
+    del pd['password']
+    return pd

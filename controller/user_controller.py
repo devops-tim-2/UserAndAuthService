@@ -1,4 +1,4 @@
-from exceptions.exceptions import InvalidCredentialsException
+from exceptions.exceptions import InvalidCredentialsException, InvalidAuthException, InvalidDataException, NotAccessibleException, NotFoundException
 from flask_restful import Resource, reqparse
 from service import user_service
 from models.models import User, Follow
@@ -40,8 +40,18 @@ class UserResource(Resource):
         pass
 
     def get(self, user_id):
-        # To be implemented.
-        pass
+        try:
+            if not request.headers.has_key('Authorization'):
+                return user_service.get_by_id(user_id, None), 200
+            else:
+                user = auth(request.headers)
+                return user_service.get_by_id(user_id, user), 200
+        except InvalidAuthException as e:
+            return str(e), 401
+        except NotFoundException as e:
+            return str(e), 404
+        except NotAccessibleException as e:
+            return str(e), 400
 
     def put(self, user_id):
         # To be implemented.
