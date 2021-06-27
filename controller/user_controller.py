@@ -27,11 +27,11 @@ login_parser.add_argument('username', type=str, help='Username for user account'
 login_parser.add_argument('password', type=str, help='Password for user account')
 
 follow_parser = reqparse.RequestParser()
-follow_parser.add_argument('dst', type=str, help='Destination of follow')
+follow_parser.add_argument('dst', type=int, help='Destination of follow')
 follow_parser.add_argument('mute', type=bool, help='Did the source mute the destination?')
 
 block_parser = reqparse.RequestParser()
-block_parser.add_argument('dst', type=str, help='Destination of follow')
+block_parser.add_argument('dst', type=int, help='Destination of follow')
 
 
 class UserResource(Resource):
@@ -133,6 +133,19 @@ class FollowResource(Resource):
         # To be implemented.
         pass
 
+    def get(self):
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+        try:
+            requests = user_service.get_follow_requests(payload['id'])
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+            
+        return [r.get_dict() for r in requests], 200
+
     def post(self):
         try:
             payload = auth(request.headers)
@@ -153,6 +166,27 @@ class FollowResource(Resource):
             return (e.message if hasattr(e, 'message') else str(e),400)
             
         return { "state": state }, 200
+
+
+class CocreteFollowResource(Resource):
+    def __init__(self):
+        # To be implemented.
+        pass
+
+    def get(self, dst):
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+        try:
+            f, s = user_service.get_follow(payload['id'], dst)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+        
+        fd = f.get_dict()
+        fd['state'] = s
+        return fd, 200
 
 class MuteResource(Resource):
     def __init__(self):
