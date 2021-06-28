@@ -80,7 +80,6 @@ class UserResource(Resource):
             return 'You can only change your profile', 403
 
         args = dto_parser.parse_args()
-        user_id=user_id
         username=args['username']
         password=args['password']
         age=args['age']
