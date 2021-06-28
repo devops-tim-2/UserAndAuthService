@@ -1,7 +1,7 @@
 from exceptions.exceptions import NotAccessibleException, NotFoundException
 from broker.producer import publish
 from models.models import AgentRequest, Follow, FollowRequest, User
-from exceptions.exceptions import AlreadyFollowException, AlreadySentFollowRequestException, InvalidRoleException, InvalidCredentialsException, MissingUserException
+from exceptions.exceptions import AlreadyFollowException, AlreadySentFollowRequestException, InvalidRoleException, InvalidCredentialsException, MissingUserException, DoesNotFollowException
 from repository import user_repository, agent_request_repository, follow_request_repository, follow_repository, block_repository
 import bcrypt 
 
@@ -15,6 +15,7 @@ MESSAGE_AGENT_REQUEST_CREATED = 'agent.request.created'
 MESSAGE_USER_CREATED = 'user.created'
 MESSAGE_USER_BLOCK_CREATED = 'user.block.created'
 MESSAGE_USER_BLOCK_DELETED = 'user.block.deleted'
+MESSAGE_USER_FOLLOW_MUTE = 'user.follow.updated'
 
 def register_user(user:User) -> User:
     # Server validates sent data
@@ -138,6 +139,18 @@ def get_follow(src, dst):
         follow = follow_request_repository.get(src,dst)
         return follow, 'PENDING'
     raise NotFoundException()
+
+
+def mute(src, dst):
+    if follow_repository.exists(src, dst):
+        follow = follow_repository.get(src,dst)
+        current_mute_status = follow.mute
+        follow_persistent = follow_repository.mute(follow, not(current_mute_status))
+        publish(MESSAGE_USER_FOLLOW_MUTE, follow_persistent.get_dict())
+        return follow_persistent.mute
+
+    raise DoesNotFollowException()
+
 
 def get_by_id(profile_id: int, user: dict):
     if not(user is None) and block_repository.exists(user['id'], profile_id):
