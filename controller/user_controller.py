@@ -119,7 +119,6 @@ class RegisterResource(Resource):
         except Exception as e:
             return (e.message if hasattr(e, 'message') else str(e),400)
             
-        print(f"#####{user_persistent.get_dict()}####")
         if user_persistent:
             dt = user_persistent.get_dict()
             del dt['password']
@@ -193,9 +192,20 @@ class MuteResource(Resource):
         # To be implemented.
         pass
 
-    def get(self):
-        # To be implemented.
-        pass
+    def get(self, dst):
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+        try:
+            s = user_service.mute(payload['id'], dst)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+        
+        response = {}
+        response['muted'] = s
+        return response, 200
 
 
 class BlockResource(Resource):
