@@ -39,7 +39,7 @@ def setup_config(cfg_name: str):
     api.add_resource(RegisterResource, '/api/register')
     api.add_resource(FollowResource, '/api/follow')
     api.add_resource(CocreteFollowResource, '/api/concretefollow/<dst>')
-    api.add_resource(MuteResource, '/api/follow/mute')
+    api.add_resource(MuteResource, '/api/follow/mute/<dst>')
     api.add_resource(BlockResource, '/api/block')
 
 

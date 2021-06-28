@@ -130,4 +130,4 @@ dmypy.json
 
 .dbdata
 
-common/database.db
+*.db

@@ -1,7 +1,7 @@
 from exceptions.exceptions import InvalidCredentialsException, InvalidAuthException, InvalidDataException, NotAccessibleException, NotFoundException
 from flask_restful import Resource, reqparse
 from service import user_service
-from models.models import User, Follow
+from models.models import Block, User, Follow
 
 from common.utils import auth
 from flask import request
@@ -119,7 +119,6 @@ class RegisterResource(Resource):
         except Exception as e:
             return (e.message if hasattr(e, 'message') else str(e),400)
             
-        print(f"#####{user_persistent.get_dict()}####")
         if user_persistent:
             dt = user_persistent.get_dict()
             del dt['password']
@@ -193,9 +192,20 @@ class MuteResource(Resource):
         # To be implemented.
         pass
 
-    def get(self):
-        # To be implemented.
-        pass
+    def get(self, dst):
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+        try:
+            s = user_service.mute(payload['id'], dst)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+        
+        response = {}
+        response['muted'] = s
+        return response, 200
 
 
 class BlockResource(Resource):
@@ -204,5 +214,21 @@ class BlockResource(Resource):
         pass
 
     def post(self):
-        # To be implemented.
-        pass
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+        args = block_parser.parse_args()
+
+        block = Block(
+            src=payload['id'],
+            dst=args['dst']
+        )
+
+        try:
+            state = user_service.block(block)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+            
+        return { "blocked": state }, 200
