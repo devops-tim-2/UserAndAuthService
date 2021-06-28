@@ -44,3 +44,4 @@ class TestBlock:
     def teardown_class(cls):
         from common.database import db_session
         db_session.rollback()
+        
