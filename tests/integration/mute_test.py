@@ -52,3 +52,7 @@ class TestMute:
         assert response.status_code == 400
 
     
+    @classmethod
+    def teardown_class(cls):
+        from common.database import db_session
+        db_session.rollback()

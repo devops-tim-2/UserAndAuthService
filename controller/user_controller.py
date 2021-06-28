@@ -7,31 +7,46 @@ from common.utils import auth
 from flask import request
 
 dto_parser = reqparse.RequestParser()
-dto_parser.add_argument('username', type=str, help='Username for user account')
-dto_parser.add_argument('password', type=str, help='Password for user account')
-dto_parser.add_argument('role', type=str, help='Role for user account')
-dto_parser.add_argument('age', type=int, help='Age for user account')
-dto_parser.add_argument('sex', type=str, help='Sex for user account')
-dto_parser.add_argument('region', type=str, help='Region for user account')
-dto_parser.add_argument('interests', type=str, help='Interests for user account')
-dto_parser.add_argument('bio', type=str, help='Bio for user account')
-dto_parser.add_argument('website', type=str, help='Website for user account')
-dto_parser.add_argument('phone', type=str, help='Phone for user account')
-dto_parser.add_argument('mail', type=str, help='Email for user account')
-dto_parser.add_argument('profile_image_link', type=str, help='Profile image link for user account')
-dto_parser.add_argument('public', type=bool, help='Is profile public?')
-dto_parser.add_argument('taggable', type=bool, help='Is profile taggable?')
+dto_parser.add_argument('username', type=str, help='Username for user account (registration)')
+dto_parser.add_argument('password', type=str, help='Password for user account (registration)')
+dto_parser.add_argument('role', type=str, help='Role for user account (registration)')
+dto_parser.add_argument('age', type=int, help='Age for user account (registration)')
+dto_parser.add_argument('sex', type=str, help='Sex for user account (registration)')
+dto_parser.add_argument('region', type=str, help='Region for user account (registration)')
+dto_parser.add_argument('interests', type=str, help='Interests for user account (registration)')
+dto_parser.add_argument('bio', type=str, help='Bio for user account (registration)')
+dto_parser.add_argument('website', type=str, help='Website for user account (registration)')
+dto_parser.add_argument('phone', type=str, help='Phone for user account (registration)')
+dto_parser.add_argument('mail', type=str, help='Email for user account (registration)')
+dto_parser.add_argument('profile_image_link', type=str, help='Profile image link for user account (registration)')
+dto_parser.add_argument('public', type=bool, help='Is profile public? (registration)')
+dto_parser.add_argument('taggable', type=bool, help='Is profile taggable? (registration)')
+
+
+put_parser = reqparse.RequestParser()
+put_parser.add_argument('username', type=str, help='Username for user account (update)')
+put_parser.add_argument('password', type=str, help='Password for user account (update)')
+put_parser.add_argument('age', type=int, help='Age for user account (update)')
+put_parser.add_argument('sex', type=str, help='Sex for user account (update)')
+put_parser.add_argument('region', type=str, help='Region for user account (update)')
+put_parser.add_argument('interests', type=str, help='Interests for user account (update)')
+put_parser.add_argument('bio', type=str, help='Bio for user account (update)')
+put_parser.add_argument('website', type=str, help='Website for user account (update)')
+put_parser.add_argument('phone', type=str, help='Phone for user account (update)')
+put_parser.add_argument('profile_image_link', type=str, help='Profile image link for user account (update)')
+put_parser.add_argument('public', type=bool, help='Is profile public? (update)')
+put_parser.add_argument('taggable', type=bool, help='Is profile taggable? (update)')
 
 login_parser = reqparse.RequestParser()
-login_parser.add_argument('username', type=str, help='Username for user account')
-login_parser.add_argument('password', type=str, help='Password for user account')
+login_parser.add_argument('username', type=str, help='Username for user account (login)')
+login_parser.add_argument('password', type=str, help='Password for user account (login)')
 
 follow_parser = reqparse.RequestParser()
 follow_parser.add_argument('dst', type=int, help='Destination of follow')
 follow_parser.add_argument('mute', type=bool, help='Did the source mute the destination?')
 
 block_parser = reqparse.RequestParser()
-block_parser.add_argument('dst', type=int, help='Destination of follow')
+block_parser.add_argument('dst', type=int, help='Destination of block')
 
 
 class UserResource(Resource):
@@ -54,8 +69,42 @@ class UserResource(Resource):
             return str(e), 400
 
     def put(self, user_id):
-        # To be implemented.
-        pass
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+
+        if int(payload['id']) != int(user_id):
+            return 'You can only change your profile', 403
+
+        args = dto_parser.parse_args()
+        username=args['username']
+        password=args['password']
+        age=args['age']
+        sex=args['sex']
+        region=args['region']
+        interests=args['interests']
+        bio=args['bio']
+        website=args['website']
+        phone=args['phone']
+        profile_image_link=args['profile_image_link']
+        public=args['public']
+        taggable=args['taggable']
+
+        try:
+            user_persistent = user_service.update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable)
+
+
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+            
+        if user_persistent:
+            dt = user_persistent.get_dict()
+            del dt['password']
+            return (dt,200) 
+            
+        return 'Updating user failed',400
 
     def delete(self, user_id):
         # To be implemented.
