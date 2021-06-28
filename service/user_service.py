@@ -2,7 +2,7 @@ from exceptions.exceptions import NotAccessibleException, NotFoundException
 from broker.producer import publish
 from models.models import AgentRequest, Follow, FollowRequest, User
 from exceptions.exceptions import AlreadyFollowException, AlreadySentFollowRequestException, InvalidRoleException, InvalidCredentialsException, MissingUserException
-from repository import user_repository, agent_request_repository, follow_request_repository, follow_repository
+from repository import user_repository, agent_request_repository, follow_request_repository, follow_repository, block_repository
 import bcrypt 
 
 import time
@@ -10,8 +10,11 @@ from os import environ
 import jwt
 
 MESSAGE_USER_FOLLOW_CREATED = 'user.follow.created'
+MESSAGE_USER_FOLLOW_DELETED = 'user.follow.deleted'
 MESSAGE_AGENT_REQUEST_CREATED = 'agent.request.created'
 MESSAGE_USER_CREATED = 'user.created'
+MESSAGE_USER_BLOCK_CREATED = 'user.block.created'
+MESSAGE_USER_BLOCK_DELETED = 'user.block.deleted'
 
 def register_user(user:User) -> User:
     # Server validates sent data
@@ -76,7 +79,11 @@ def follow(follow):
     if follow_request_repository.exists(follow.src, follow.dst):
         raise AlreadySentFollowRequestException()
     if follow_repository.exists(follow.src, follow.dst):
-        raise AlreadyFollowException()
+        follow_persistent = follow_repository.get(follow.src, follow.dst)
+        follow_id = follow_persistent.id
+        follow_repository.delete(follow.src, follow.dst)
+        publish(MESSAGE_USER_FOLLOW_DELETED, follow_id)
+        return 'Unfollow'
         
     if dst_user.public and src_user.public:
         persisted_follow = follow_repository.create(follow)
@@ -99,6 +106,30 @@ def follow(follow):
             return "Request"
 
 
+def block(block):
+    src_user = user_repository.get_by_id(block.src)
+    dst_user = user_repository.get_by_id(block.dst)
+
+    if src_user is None or dst_user is None:
+        raise MissingUserException()
+
+    if follow_request_repository.exists(block.src, block.dst):
+        raise AlreadySentFollowRequestException()
+    if follow_repository.exists(block.src, block.dst):
+        raise AlreadyFollowException()
+        
+    if block_repository.exists(block.src, block.dst):
+        block_id = block.id
+        block_repository.delete(block)
+        publish(MESSAGE_USER_BLOCK_DELETED, block_id)
+        return False
+    else:
+        persisted_block = block_repository.create(block)
+        publish(MESSAGE_USER_BLOCK_CREATED, persisted_block.get_dict())
+        return True
+   
+
+
 def get_follow(src, dst):
     if follow_repository.exists(src, dst):
         follow = follow_repository.get(src,dst)
@@ -109,6 +140,9 @@ def get_follow(src, dst):
     raise NotFoundException()
 
 def get_by_id(profile_id: int, user: dict):
+    if not(user is None) and block_repository.exists(user['id'], profile_id):
+        raise NotFoundException()
+
     profile = user_repository.get_by_id(profile_id)
 
     pd = profile.get_dict()
