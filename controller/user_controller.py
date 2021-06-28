@@ -22,6 +22,22 @@ dto_parser.add_argument('profile_image_link', type=str, help='Profile image link
 dto_parser.add_argument('public', type=bool, help='Is profile public?')
 dto_parser.add_argument('taggable', type=bool, help='Is profile taggable?')
 
+
+put_parser = reqparse.RequestParser()
+put_parser.add_argument('username', type=str, help='Username for user account')
+put_parser.add_argument('password', type=str, help='Password for user account')
+put_parser.add_argument('age', type=int, help='Age for user account')
+put_parser.add_argument('sex', type=str, help='Sex for user account')
+put_parser.add_argument('region', type=str, help='Region for user account')
+put_parser.add_argument('interests', type=str, help='Interests for user account')
+put_parser.add_argument('bio', type=str, help='Bio for user account')
+put_parser.add_argument('website', type=str, help='Website for user account')
+put_parser.add_argument('phone', type=str, help='Phone for user account')
+put_parser.add_argument('mail', type=str, help='Email for user account')
+put_parser.add_argument('profile_image_link', type=str, help='Profile image link for user account')
+put_parser.add_argument('public', type=bool, help='Is profile public?')
+put_parser.add_argument('taggable', type=bool, help='Is profile taggable?')
+
 login_parser = reqparse.RequestParser()
 login_parser.add_argument('username', type=str, help='Username for user account')
 login_parser.add_argument('password', type=str, help='Password for user account')
@@ -54,8 +70,44 @@ class UserResource(Resource):
             return str(e), 400
 
     def put(self, user_id):
-        # To be implemented.
-        pass
+        try:
+            payload = auth(request.headers)
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),403)
+
+
+        if int(payload['id']) != int(user_id):
+            return 'You can only change your profile', 403
+
+        args = dto_parser.parse_args()
+        user_id=user_id
+        username=args['username']
+        password=args['password']
+        age=args['age']
+        sex=args['sex']
+        region=args['region']
+        interests=args['interests']
+        bio=args['bio']
+        website=args['website']
+        phone=args['phone']
+        mail=args['mail']
+        profile_image_link=args['profile_image_link']
+        public=args['public']
+        taggable=args['taggable']
+
+        try:
+            user_persistent = user_service.update(user_id, username, password, age, sex, region, interests, bio, website, phone, mail, profile_image_link, public, taggable)
+
+
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
+            
+        if user_persistent:
+            dt = user_persistent.get_dict()
+            del dt['password']
+            return (dt,200) 
+            
+        return 'Updating user failed',400
 
     def delete(self, user_id):
         # To be implemented.

@@ -35,3 +35,8 @@ class TestLogin:
         valid_user_2_data = { "username": "user1","password": "password2"}
         response = self.client.post('/api/login', data=json.dumps(valid_user_2_data), content_type='application/json')
         assert response.status_code == 403
+        
+    @classmethod
+    def teardown_class(cls):
+        from common.database import db_session
+        db_session.rollback()
