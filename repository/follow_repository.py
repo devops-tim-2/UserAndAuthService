@@ -12,6 +12,11 @@ def create(follow):
     db_session.commit()
     return follow
 
+def delete(source, destination):
+    follow = Follow.query.filter(Follow.src == source, Follow.dst == destination).first()
+    db_session.delete(follow)
+    db_session.commit()
+    
 def mute(follow, mute_status):
     follow.mute = mute_status
     db_session.commit()
