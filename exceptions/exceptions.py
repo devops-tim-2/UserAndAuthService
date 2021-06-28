@@ -22,6 +22,10 @@ class AlreadyFollowException(Exception):
         self.message = message
         super().__init__(self.message)
 
+class DoesNotFollowException(Exception):
+    def __init__(self, message="You are not following that particular user"):
+        self.message = message
+        super().__init__(self.message)
 
 class NotAuthorizedException(Exception):
     def __init__(self, message="You are not authorized to access this endpoint"):

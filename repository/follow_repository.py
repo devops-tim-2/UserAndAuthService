@@ -11,3 +11,8 @@ def create(follow):
     db_session.add(follow)
     db_session.commit()
     return follow
+
+def mute(follow, mute_status):
+    follow.mute = mute_status
+    db_session.commit()
+    return follow
