@@ -167,9 +167,9 @@ def get_follow_requests(dst):
     return follow_request_repository.get_by_dst(dst)
 
 
-def update(user_id, username, password, age, sex, region, interests, bio, website, phone, mail, profile_image_link, public, taggable):
+def update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable):
     password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    persisted_user = user_repository.update(user_id, username, password, age, sex, region, interests, bio, website, phone, mail, profile_image_link, public, taggable)
+    persisted_user = user_repository.update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable)
     dt = persisted_user.get_dict()
     del dt['password']
     # user.created event is sent to RabbitMQ
