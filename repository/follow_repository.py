@@ -24,6 +24,6 @@ def mute(follow, mute_status):
 
 
 def delete_with_user(user_id):
-    follow_src = Follow.query.filter(Follow.src == user_id).delete()
-    follow_dst = Follow.query.filter(Follow.dst == user_id).delete()
+    Follow.query.filter(Follow.src == user_id).delete()
+    Follow.query.filter(Follow.dst == user_id).delete()
     db_session.commit()

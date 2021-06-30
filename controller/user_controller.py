@@ -51,7 +51,7 @@ block_parser.add_argument('dst', type=int, help='Destination of block')
 
 class UserResource(Resource):
     def __init__(self):
-        pass
+        super().__init__()
 
     def get(self, user_id):
         try:
@@ -118,7 +118,7 @@ class UserResource(Resource):
 
 class LoginResource(Resource):
     def __init__(self):
-        pass
+        super().__init__()
 
     def post(self):
         args = dto_parser.parse_args()
@@ -136,7 +136,7 @@ class LoginResource(Resource):
 
 class RegisterResource(Resource):
     def __init__(self):
-        pass
+        super().__init__()
 
     def post(self):
         args = dto_parser.parse_args()
@@ -173,7 +173,7 @@ class RegisterResource(Resource):
 
 class FollowResource(Resource):
     def __init__(self):
-        pass
+        super().__init__()
 
     def get(self):
         try:
@@ -212,7 +212,7 @@ class FollowResource(Resource):
 
 class CocreteFollowResource(Resource):
     def __init__(self):
-        pass
+        super().__init__()
 
     def get(self, dst):
         try:
@@ -231,7 +231,7 @@ class CocreteFollowResource(Resource):
 
 class MuteResource(Resource):
     def __init__(self):
-        pass
+        super().__init__()
 
     def get(self, dst):
         try:
@@ -251,7 +251,7 @@ class MuteResource(Resource):
 
 class BlockResource(Resource):
     def __init__(self):
-        pass
+        super().__init__()
 
     def post(self):
         try:

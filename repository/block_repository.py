@@ -18,7 +18,7 @@ def delete(source, destination):
     db_session.commit()
 
 def delete_with_user(user_id):
-    blocks_src = Block.query.filter(Block.src == user_id).delete()
-    blocks_dst = Block.query.filter(Block.dst == user_id).delete()
+    Block.query.filter(Block.src == user_id).delete()
+    Block.query.filter(Block.dst == user_id).delete()
     db_session.commit()
 
