@@ -176,3 +176,16 @@ def update(user_id, username, password, age, sex, region, interests, bio, websit
     publish(MESSAGE_USER_UPDATED, dt)
 
     return persisted_user
+
+def delete(user_id):
+    user = user_repository.get_by_id(user_id)
+
+    if not user:
+        raise NotFoundException()
+    
+    block_repository.delete_with_user(user_id)
+    follow_repository.delete_with_user(user_id)
+    follow_request_repository.delete_with_user(user_id)
+
+    user_repository.delete(user_id)
+    publish('user.deleted', user_id)

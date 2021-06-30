@@ -21,3 +21,9 @@ def mute(follow, mute_status):
     follow.mute = mute_status
     db_session.commit()
     return follow
+
+
+def delete_with_user(user_id):
+    follow_src = Follow.query.filter(Follow.src == user_id).delete()
+    follow_dst = Follow.query.filter(Follow.dst == user_id).delete()
+    db_session.commit()

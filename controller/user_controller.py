@@ -1,4 +1,4 @@
-from exceptions.exceptions import InvalidCredentialsException, InvalidAuthException, InvalidDataException, NotAccessibleException, NotFoundException
+from exceptions.exceptions import InvalidCredentialsException, InvalidAuthException, InvalidDataException, NotAccessibleException, NotAuthorizedException, NotFoundException
 from flask_restful import Resource, reqparse
 from service import user_service
 from models.models import Block, User, Follow
@@ -51,7 +51,6 @@ block_parser.add_argument('dst', type=int, help='Destination of block')
 
 class UserResource(Resource):
     def __init__(self):
-        # To be implemented.
         pass
 
     def get(self, user_id):
@@ -107,21 +106,18 @@ class UserResource(Resource):
         return 'Updating user failed',400
 
     def delete(self, user_id):
-        # To be implemented.
-        pass
-
-class UserListResource(Resource):
-    def __init__(self):
-        # To be implemented.
-        pass
-
-    def post(self):
-        # To be implemented.
-        pass
+        try:
+            payload = auth(request.headers)
+            if int(payload['id']) != int(user_id):
+                return 'You can only change your profile', 403
+            return user_service.delete(user_id), 200
+        except NotAuthorizedException:
+            return 'Invalid login credentials...',403
+        except Exception as e:
+            return (e.message if hasattr(e, 'message') else str(e),400)
 
 class LoginResource(Resource):
     def __init__(self):
-        # To be implemented.
         pass
 
     def post(self):
@@ -140,7 +136,6 @@ class LoginResource(Resource):
 
 class RegisterResource(Resource):
     def __init__(self):
-        # To be implemented.
         pass
 
     def post(self):
@@ -178,7 +173,6 @@ class RegisterResource(Resource):
 
 class FollowResource(Resource):
     def __init__(self):
-        # To be implemented.
         pass
 
     def get(self):
@@ -218,7 +212,6 @@ class FollowResource(Resource):
 
 class CocreteFollowResource(Resource):
     def __init__(self):
-        # To be implemented.
         pass
 
     def get(self, dst):
@@ -238,7 +231,6 @@ class CocreteFollowResource(Resource):
 
 class MuteResource(Resource):
     def __init__(self):
-        # To be implemented.
         pass
 
     def get(self, dst):
@@ -259,7 +251,6 @@ class MuteResource(Resource):
 
 class BlockResource(Resource):
     def __init__(self):
-        # To be implemented.
         pass
 
     def post(self):
