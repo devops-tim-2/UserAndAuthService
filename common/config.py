@@ -31,9 +31,8 @@ def setup_config(cfg_name: str):
 
 
     # This import must be postponed after init_db has been called
-    from controller.user_controller import UserResource, UserListResource, LoginResource, RegisterResource, FollowResource, MuteResource, BlockResource
+    from controller.user_controller import UserResource, LoginResource, RegisterResource, FollowResource, MuteResource, BlockResource
     api.add_resource(UserResource, '/api/<user_id>')
-    api.add_resource(UserListResource, '/api')
     api.add_resource(LoginResource, '/api/login')
     api.add_resource(RegisterResource, '/api/register')
     api.add_resource(FollowResource, '/api/follow')

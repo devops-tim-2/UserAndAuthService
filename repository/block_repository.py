@@ -16,3 +16,9 @@ def delete(source, destination):
     block = Block.query.filter(Block.src == source, Block.dst == destination).first()
     db_session.delete(block)
     db_session.commit()
+
+def delete_with_user(user_id):
+    Block.query.filter(Block.src == user_id).delete()
+    Block.query.filter(Block.dst == user_id).delete()
+    db_session.commit()
+
