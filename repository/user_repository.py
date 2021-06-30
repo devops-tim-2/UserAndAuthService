@@ -12,3 +12,20 @@ def get_by_username(username):
 def get_by_id(id):
     user = User.query.get(id)
     return user
+
+def update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable):
+    user = User.query.get(user_id)
+    user.username = username if username else user.username
+    user.password = password if password else user.password
+    user.age = age if age else user.age
+    user.sex = sex if sex else user.sex
+    user.region = region if region else user.region
+    user.interests = interests if interests else user.interests
+    user.bio = bio if bio else user.bio
+    user.website = website if website else user.website
+    user.phone = phone if phone else user.phone
+    user.profile_image_link = profile_image_link if profile_image_link else user.profile_image_link
+    user.public = public if public else user.public
+    user.taggable = taggable if taggable else user.taggable
+    db_session.commit()
+    return user

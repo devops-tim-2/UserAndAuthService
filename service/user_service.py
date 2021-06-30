@@ -13,6 +13,7 @@ MESSAGE_USER_FOLLOW_CREATED = 'user.follow.created'
 MESSAGE_USER_FOLLOW_DELETED = 'user.follow.deleted'
 MESSAGE_AGENT_REQUEST_CREATED = 'agent.request.created'
 MESSAGE_USER_CREATED = 'user.created'
+MESSAGE_USER_UPDATED = 'user.updated'
 MESSAGE_USER_BLOCK_CREATED = 'user.block.created'
 MESSAGE_USER_BLOCK_DELETED = 'user.block.deleted'
 MESSAGE_USER_FOLLOW_MUTE = 'user.follow.updated'
@@ -164,3 +165,14 @@ def get_by_id(profile_id: int, user: dict):
 
 def get_follow_requests(dst):
     return follow_request_repository.get_by_dst(dst)
+
+
+def update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable):
+    password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    persisted_user = user_repository.update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable)
+    dt = persisted_user.get_dict()
+    del dt['password']
+    # user.created event is sent to RabbitMQ
+    publish(MESSAGE_USER_UPDATED, dt)
+
+    return persisted_user
