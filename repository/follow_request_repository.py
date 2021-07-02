@@ -19,3 +19,8 @@ def delete(source, destination):
 
 def get_by_dst(destination):
     return FollowRequest.query.filter(FollowRequest.dst == destination)
+
+def delete_with_user(user_id):
+    FollowRequest.query.filter(FollowRequest.src == user_id).delete()
+    FollowRequest.query.filter(FollowRequest.dst == user_id).delete()
+    db_session.commit()

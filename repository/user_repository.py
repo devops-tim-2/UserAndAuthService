@@ -29,3 +29,9 @@ def update(user_id, username, password, age, sex, region, interests, bio, websit
     user.taggable = taggable if taggable else user.taggable
     db_session.commit()
     return user
+
+
+def delete(user_id):
+    user = User.query.filter(User.id == user_id).first()
+    db_session.delete(user)
+    db_session.commit()
