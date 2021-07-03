@@ -13,10 +13,9 @@ def get_by_id(id):
     user = User.query.get(id)
     return user
 
-def update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable):
+def update(user_id, username, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable):
     user = User.query.get(user_id)
     user.username = username if username else user.username
-    user.password = password if password else user.password
     user.age = age if age else user.age
     user.sex = sex if sex else user.sex
     user.region = region if region else user.region
