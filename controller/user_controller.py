@@ -25,7 +25,6 @@ dto_parser.add_argument('taggable', type=bool, help='Is profile taggable? (regis
 
 put_parser = reqparse.RequestParser()
 put_parser.add_argument('username', type=str, help='Username for user account (update)')
-put_parser.add_argument('password', type=str, help='Password for user account (update)')
 put_parser.add_argument('age', type=int, help='Age for user account (update)')
 put_parser.add_argument('sex', type=str, help='Sex for user account (update)')
 put_parser.add_argument('region', type=str, help='Region for user account (update)')
@@ -77,9 +76,8 @@ class UserResource(Resource):
         if int(payload['id']) != int(user_id):
             return 'You can only change your profile', 403
 
-        args = dto_parser.parse_args()
+        args = put_parser.parse_args()
         username=args['username']
-        password=args['password']
         age=args['age']
         sex=args['sex']
         region=args['region']
@@ -92,7 +90,7 @@ class UserResource(Resource):
         taggable=args['taggable']
 
         try:
-            user_persistent = user_service.update(user_id, username, password, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable)
+            user_persistent = user_service.update(user_id, username, age, sex, region, interests, bio, website, phone, profile_image_link, public, taggable)
 
 
         except Exception as e:
