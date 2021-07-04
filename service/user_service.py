@@ -24,7 +24,7 @@ def register_user(user:User) -> User:
         # Password is encrypted using bcrypt algorithm
         user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         # User is saved to database with state set to PENDING
-        user.state = 'PENDING'
+        user.state = 'ACCEPTED'
         persisted_user = user_repository.create(user)
         # New entity is created in AgentRequest table with u_id pointing to created user id
         agent_request = AgentRequest(u_id=persisted_user.id)
@@ -32,7 +32,6 @@ def register_user(user:User) -> User:
 
 
         dt = persisted_user.get_dict()
-        del dt['password']
         dt['agent_request_id'] = persisted_agent_request.id
         # agent.request.created event is sent to RabbitMQ
         publish(MESSAGE_AGENT_REQUEST_CREATED, dt)
