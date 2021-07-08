@@ -34,3 +34,19 @@ def delete(user_id):
     user = User.query.filter(User.id == user_id).first()
     db_session.delete(user)
     db_session.commit()
+
+
+def approve(user_id: int):
+    user = User.query.filter_by(id=user_id).first()
+
+    user.state = 'ACCEPTED'
+
+    db_session.commit()
+
+
+def reject(user_id: int):
+    user = User.query.filter_by(id=user_id).first()
+
+    user.state = 'REJECTED'
+
+    db_session.commit()
