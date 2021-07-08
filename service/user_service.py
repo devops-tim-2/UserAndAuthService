@@ -24,7 +24,7 @@ def register_user(user:User) -> User:
         # Password is encrypted using bcrypt algorithm
         user.password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         # User is saved to database with state set to PENDING
-        user.state = 'ACCEPTED'
+        user.state = 'PENDING'
         persisted_user = user_repository.create(user)
         # New entity is created in AgentRequest table with u_id pointing to created user id
         agent_request = AgentRequest(u_id=persisted_user.id)
@@ -188,3 +188,11 @@ def delete(user_id):
 
     user_repository.delete(user_id)
     publish('user.deleted', user_id)
+
+
+def approve(user_id: int):
+    user_repository.approve(user_id)
+
+
+def reject(user_id: int):
+    user_repository.reject(user_id)
