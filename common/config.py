@@ -1,5 +1,4 @@
 from controller.user_controller import CocreteFollowResource
-from models.models import FollowRequest
 from os import environ
 from flask_cors import CORS
 from flask.app import Flask
@@ -32,19 +31,18 @@ def setup_config(cfg_name: str):
 
 
     # This import must be postponed after init_db has been called
-    from controller.user_controller import UserResource, UserListResource, LoginResource, RegisterResource, FollowResource, MuteResource, BlockResource
+    from controller.user_controller import UserResource, LoginResource, RegisterResource, FollowResource, MuteResource, BlockResource
     api.add_resource(UserResource, '/api/<user_id>')
-    api.add_resource(UserListResource, '/api')
     api.add_resource(LoginResource, '/api/login')
     api.add_resource(RegisterResource, '/api/register')
     api.add_resource(FollowResource, '/api/follow')
     api.add_resource(CocreteFollowResource, '/api/concretefollow/<dst>')
-    api.add_resource(MuteResource, '/api/follow/mute')
+    api.add_resource(MuteResource, '/api/follow/mute/<dst>')
     api.add_resource(BlockResource, '/api/block')
 
 
     # This import must be postponed after init_db has been called
-    from models.models import AgentRequest, User, Follow, Block
+    from models.models import AgentRequest, User, Follow, Block, FollowRequest
     if cfg_name == 'test':
         User.query.delete()
         Follow.query.delete()
